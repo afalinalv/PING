@@ -1,12 +1,19 @@
 package site.app4web.ping;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -15,6 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
+    private WebView webView;
     EditText editText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,12 +33,25 @@ public class MainActivity extends AppCompatActivity {
         if (isConnected())
             Toast.makeText(getApplicationContext(), "Инет Есть", Toast.LENGTH_SHORT).show();
         else Toast.makeText(getApplicationContext(), "НЕТ Инет ", Toast.LENGTH_SHORT).show();
+        webView = findViewById(R.id.webView);
+        // включаем поддержку JavaScript
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebViewClient(new MyWebViewClient());
+        // указываем страницу загрузки
+        //webView.loadUrl("http://developer.alexanderklimov.ru/android");
     }
     // https://xakep.ru/2015/06/11/coding-android-widget-site-availability/
     public void onClick(View view) {
+        // прячем клавиатуру. butCalculate - это кнопка
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+
         String TryText = editText.getText().toString();
             if (tryHttp(TryText)) { // работает изучать
+                TryText = editText.getText().toString();
                 Toast.makeText(getApplicationContext(), "Сайт доступен", Toast.LENGTH_SHORT).show();
+                webView.loadUrl(TryText);
             } else {
                 Toast.makeText(getApplicationContext(), "Сайт НЕ доступен", Toast.LENGTH_SHORT).show();
             }
@@ -80,5 +101,13 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) { }
         Toast.makeText(getApplicationContext(), "НЕ доступен  "+ url, Toast.LENGTH_SHORT).show();
         return false;
+    }
+    private class MyWebViewClient extends WebViewClient {
+        @TargetApi(Build.VERSION_CODES.N)
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            view.loadUrl(request.getUrl().toString());
+            return true;
+        }
     }
 }
