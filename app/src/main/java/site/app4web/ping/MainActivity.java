@@ -16,12 +16,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
-
-
-import org.apache.commons.validator.routines.UrlValidator;
-
+\
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
@@ -88,10 +86,9 @@ public class MainActivity extends AppCompatActivity {
         if (pingHttp(url_temp)) return true;
         if (!url.startsWith("http")) url_temp = "https://"+ url;
         if (pingHttp(url_temp)) return true;
-        String[] schemes = {"http","https"};
-               // UrlValidator urlValidator = new UrlValidator(schemes);
-        if (!new UrlValidator(schemes).isValid(url)) {
-            Toast.makeText(getApplicationContext(), "Попала в не ВАЛИДАТОР  "+ url, Toast.LENGTH_LONG).show();
+
+        try { new URL(url); } catch (MalformedURLException e) {
+            Toast.makeText(getApplicationContext(), "Попала в MalformedURLException  "+ url, Toast.LENGTH_LONG).show();
             return false;
         }
         url_temp = url;
@@ -100,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
         if (pingHttp(url_temp)) return true;
         url_temp = url.replace("http://","https://");
         if (pingHttp(url_temp)) return true;
-
 
         return false;
     }
