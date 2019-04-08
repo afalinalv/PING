@@ -16,8 +16,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
-
+//  System.setProperty("sun.net.http.retryPost", "false")
 import java.io.IOException;
+//import java.net.HttpURLConnection;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -78,8 +79,9 @@ public class MainActivity extends AppCompatActivity {
         if (url.startsWith("www."))  if (pingHttp("https://"+ url)) return true;
         if (url.startsWith("www."))  if (pingHttp(url.replace("www.","http://"))) return true;
         if (url.startsWith("www."))  if (pingHttp(url.replace("www.","https://"))) return true;
-        if (!url.startsWith("http")) if (pingHttp("http://"+ url)) return true;
         if (!url.startsWith("http")) if (pingHttp("https://"+ url)) return true;
+        if (!url.startsWith("http")) if (pingHttp("http://"+ url)) return true;
+
         // Если это все таки URL - проверка на правильность и http <--> https
         try { new URL(url); } catch (MalformedURLException e) {
             Toast.makeText(getApplicationContext(), "Попала в MalformedURLException  "+ url, Toast.LENGTH_LONG).show();
@@ -97,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             httpConnection = (HttpURLConnection) new URL(url).openConnection();
             httpConnection.setRequestMethod("HEAD");
-            if (httpConnection.getResponseCode() == 200){
+            int code = httpConnection.getResponseCode();
+            if (code == 200){
                 Toast.makeText(getApplicationContext(), "Сайт доступен  "+ url, Toast.LENGTH_LONG).show();
                editText.setText(url);
                 return true;
