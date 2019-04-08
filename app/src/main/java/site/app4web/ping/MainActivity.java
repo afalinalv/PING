@@ -17,6 +17,9 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
 
+
+import org.apache.commons.validator.routines.UrlValidator;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -64,13 +67,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public  boolean tryHttp(String url) {
-        url = url.toLowerCase().trim();
-        String url_temp = url;
-        if (pingHttp(url_temp)) return true;  // Простая прямая проверка на то что ввели в url
-        url_temp = url.replace("https://","http://");
-        if (pingHttp(url_temp)) return true;
-        url_temp = url.replace("http://","https://");
-        if (pingHttp(url_temp)) return true;
+        String url_temp;
+        if (!url.contains(".")) return false;
+        url = url.trim();
+        if (url.startsWith(".")) return false;
+        if (url.endsWith(".")) return false;
+        if (url.contains(" ")) return false;
+        url = url.toLowerCase();
         url_temp = url.replace("www.","");
         if (pingHttp(url_temp)) return true;
         if (url.startsWith("www.")) url_temp = "http://"+ url;
@@ -85,6 +88,19 @@ public class MainActivity extends AppCompatActivity {
         if (pingHttp(url_temp)) return true;
         if (!url.startsWith("http")) url_temp = "https://"+ url;
         if (pingHttp(url_temp)) return true;
+        String[] schemes = {"http","https"};
+               // UrlValidator urlValidator = new UrlValidator(schemes);
+        if (!new UrlValidator(schemes).isValid(url)) {
+            Toast.makeText(getApplicationContext(), "Попала в не ВАЛИДАТОР  "+ url, Toast.LENGTH_LONG).show();
+            return false;
+        }
+        url_temp = url;
+        if (pingHttp(url_temp)) return true;  // Простая прямая проверка на то что ввели в url
+        url_temp = url.replace("https://","http://");
+        if (pingHttp(url_temp)) return true;
+        url_temp = url.replace("http://","https://");
+        if (pingHttp(url_temp)) return true;
+
 
         return false;
     }
