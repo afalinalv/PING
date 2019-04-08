@@ -16,7 +16,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
-\
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -65,38 +65,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public  boolean tryHttp(String url) {
-        String url_temp;
+        // Если точно не САЙТ - в ПОИСК
         if (!url.contains(".")) return false;
         url = url.trim();
         if (url.startsWith(".")) return false;
         if (url.endsWith(".")) return false;
         if (url.contains(" ")) return false;
+        // Если WWW или м.б. сайт без HTTH то удалить приклеть и проверить Сайт или в Поиск
         url = url.toLowerCase();
-        url_temp = url.replace("www.","");
-        if (pingHttp(url_temp)) return true;
-        if (url.startsWith("www.")) url_temp = "http://"+ url;
-        if (pingHttp(url_temp)) return true;
-        if (url.startsWith("www.")) url_temp = "https://"+ url;
-        if (pingHttp(url_temp)) return true;
-        if (url.startsWith("www.")) url_temp = url.replace("www.","http://");
-        if (pingHttp(url_temp)) return true;
-        if (url.startsWith("www.")) url_temp = url.replace("www.","https://");
-        if (pingHttp(url_temp)) return true;
-        if (!url.startsWith("http")) url_temp = "http://"+ url;
-        if (pingHttp(url_temp)) return true;
-        if (!url.startsWith("http")) url_temp = "https://"+ url;
-        if (pingHttp(url_temp)) return true;
-
+        if (url.contains("www."))    if (pingHttp(url.replace("www.",""))) return true;
+        if (url.startsWith("www."))  if (pingHttp("http://"+ url)) return true;
+        if (url.startsWith("www."))  if (pingHttp("https://"+ url)) return true;
+        if (url.startsWith("www."))  if (pingHttp(url.replace("www.","http://"))) return true;
+        if (url.startsWith("www."))  if (pingHttp(url.replace("www.","https://"))) return true;
+        if (!url.startsWith("http")) if (pingHttp("http://"+ url)) return true;
+        if (!url.startsWith("http")) if (pingHttp("https://"+ url)) return true;
+        // Если это все таки URL - проверка на правильность и http <--> https
         try { new URL(url); } catch (MalformedURLException e) {
             Toast.makeText(getApplicationContext(), "Попала в MalformedURLException  "+ url, Toast.LENGTH_LONG).show();
             return false;
         }
-        url_temp = url;
-        if (pingHttp(url_temp)) return true;  // Простая прямая проверка на то что ввели в url
-        url_temp = url.replace("https://","http://");
-        if (pingHttp(url_temp)) return true;
-        url_temp = url.replace("http://","https://");
-        if (pingHttp(url_temp)) return true;
+        // Это наконец есть ли указанный "точно" сайт в Сети
+        if (pingHttp(url)) return true;  // Простая прямая проверка на то что ввели в url
+        if (url.startsWith("http:"))  if (pingHttp(url.replace("http://", "https://"))) return true;
+        if (url.startsWith("https:")) if (pingHttp(url.replace("https://","http://" ))) return true;
 
         return false;
     }
