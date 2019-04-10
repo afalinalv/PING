@@ -22,6 +22,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -203,9 +204,7 @@ public class MainActivity extends AppCompatActivity {
         private String temp;
         @Override
         protected void onPreExecute() {
-            int a=0;
-
-        }
+         }
         @Override
         protected Boolean doInBackground(String... urls) {
 
@@ -215,38 +214,20 @@ public class MainActivity extends AppCompatActivity {
                     httpConnection = (HttpURLConnection) new URL(url).openConnection();
                     httpConnection.setRequestMethod("HEAD");
                     int code = httpConnection.getResponseCode();
-                    if (code == 200) {
+                    if (code == 200) { // HttpURLConnection.HTTP_OK HttpURLConnection.HTTP_NOT_FOUND
                         temp = url;
-                        httpEdit =temp;
+                        httpEdit =url;
                         return true;
                     }
-                } catch (IOException e) {temp = "catch "+url; return false; }
-
-
-         /*   try {
-                    private HttpURLConnection connection;
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK ) {
-                    text.setText("La page existe");
-                    return true;
-                }
-                else if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND ) {
-                    text.setText("La page n'existe pas");
-                    return false;
-                }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }*/
-                temp = "catch "+url;
-                return false;
+                } catch (IOException e) { }
             }
+            temp = "catch "+httpEdit;
             return false;
         }
         @Override
         protected void onPostExecute(Boolean result) {
-            Toast.makeText(getApplicationContext(), "Подзадача  "+temp, Toast.LENGTH_SHORT).show();
-           // if (result)  editText.setText(temp);
-        }
+            Toast.makeText(getApplicationContext(), result+"  Подзадача  "+temp, Toast.LENGTH_SHORT).show();
+          }
     }
 
     private class MyWebViewClient extends WebViewClient {
